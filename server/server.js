@@ -1,4 +1,4 @@
-// MUST be first – ESM-safe dotenv
+
 import "dotenv/config";
 
 import express from "express";
@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 ========================= */
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
     credentials: true,
   })
 );
@@ -34,7 +34,7 @@ app.use(
 ========================= */
 export const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
   },
 });
 
@@ -42,7 +42,10 @@ export const userSocketMap = {};
 
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
-  if (userId) userSocketMap[userId] = socket.id;
+
+  if (userId) {
+    userSocketMap[userId] = socket.id;
+  }
 
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
@@ -87,12 +90,18 @@ const PORT = process.env.PORT || 5000;
 
 connectDB()
   .then(() => {
-    server.listen(PORT, () => {
-      
-      console.log(`Server running on port ${PORT}`);
-    });
+    if (process.env.NODE_ENV !== "production") {
+      server.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    }
   })
   .catch((err) => {
     console.error("DB connection failed:", err.message);
     process.exit(1);
   });
+
+/* =========================
+   EXPORT SERVER (IMPORTANT)
+========================= */
+export default server;
