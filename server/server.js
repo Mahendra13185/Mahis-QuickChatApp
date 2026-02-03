@@ -1,4 +1,4 @@
-
+// MUST be first – ESM-safe dotenv
 import "dotenv/config";
 
 import express from "express";
@@ -35,6 +35,8 @@ app.use(
 export const io = new Server(server, {
   cors: {
     origin: process.env.CLIENT_URL || "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
@@ -84,24 +86,17 @@ app.use((err, req, res, next) => {
 });
 
 /* =========================
-   START SERVER
+   START SERVER (REQUIRED)
 ========================= */
 const PORT = process.env.PORT || 5000;
 
 connectDB()
   .then(() => {
-    if (process.env.NODE_ENV !== "production") {
-      server.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-      });
-    }
+    server.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
   })
   .catch((err) => {
-    console.error("DB connection failed:", err.message);
+    console.error("❌ DB connection failed:", err.message);
     process.exit(1);
   });
-
-/* =========================
-   EXPORT SERVER (IMPORTANT)
-========================= */
-export default server;
