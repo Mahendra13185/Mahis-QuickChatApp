@@ -7,11 +7,11 @@ import {
 } from "../controllers/userController.js";
 import { protectRoute } from "../middleware/auth.js";
 
-const userRouter = express.Router();
+const userRoutes = express.Router();
 
-userRouter.post("/signup", signup);
-userRouter.post("/login", login);
-userRouter.get("/check", protectRoute, checkAuth);
-userRouter.put("/update-profile", protectRoute, updateProfile);
+userRoutes.post("/signup", signup);
+userRoutes.post("/login", login);
+userRoutes.get("/check", protectRoute, checkAuth);
+userRoutes.put("/update-profile", protectRoute, updateProfile);
 
-export default userRouter;
+export default userRoutes;
